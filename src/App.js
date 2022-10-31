@@ -3,7 +3,9 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
-import { Routes, Route, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
 const ProgressBar = (props) => {
   // 총너비 / 총스텝길이 * 현재스텝
@@ -39,12 +41,6 @@ const Answer = (props) => {
             value: props.value,
           },
         });
-
-        // const pathname = window.location.pathname;
-        // const nextStep = parseInt(pathname.charAt(pathname.length - 1)) + 1;
-        // navigation(`/on${nextStep}`);
-
-        // navigation('');
       }}
     >
       {props.text}
@@ -117,6 +113,25 @@ function On5() {
 }
 
 function Result() {
+  const { state } = useLocation();
+
+  // axios
+  const MBTI결과가져오기 = () => {
+    axios({
+      url: "http://localhost:5000/mbti",
+      method: "GET", // GET , POST
+      responseType: "json",
+      params: state,
+    })
+      .then(() => {})
+      .catch((e) => {
+        console.log("에러!!", e);
+      });
+  };
+  React.useEffect(() => {
+    MBTI결과가져오기();
+  }, []);
+
   return <div>결과화면 !!</div>;
 }
 
@@ -149,6 +164,8 @@ const StoreContext = React.createContext({});
  * React useReducer [비지니스 로직 분리되어있는걸 한곳에 마법~]
  */
 function App() {
+  const navigation = useNavigate();
+
   const [dispatch, setDispatchType] = React.useState({
     code: null,
     params: null,
@@ -171,41 +188,57 @@ function App() {
       J: 0, // 계획
     },
   ]);
-  const [loginUser, setLoginUser] = React.useState({
-    id: "zz",
-    pw: "zz",
-  });
+  let [page, setPage] = React.useState(1);
 
   React.useEffect(() => {
     switch (dispatch.code) {
-      /**
-       * mbti state값을 바꾸는 로직 구현
-       */
       case "답변":
-        const { value } = dispatch.params;
+        /**
+         * onClick
+         */
+        const cloneMbti = [...mbti];
+        const findIndex = cloneMbti.findIndex((item) => {
+          return item[dispatch.params.value] !== undefined;
+        });
 
-        break;
+        cloneMbti[findIndex][dispatch.params.value] += 1;
+        setMbti(cloneMbti);
 
-      /**
-       * 로그인 하는 로직 구현
-       */
-      case "로그인":
+        /**
+         * 페이지 이동
+         */
+        const nextPage = (page += 1);
+        setPage(nextPage);
+
+        if (nextPage === 6) {
+          navigation("/result", {
+            state: mbti,
+          });
+        } else {
+          navigation(`/on${nextPage}`);
+        }
+
         break;
 
       default:
         break;
     }
+
+    // 의존성
   }, [dispatch]);
 
   return (
-    <StoreContext.Provider value={{ setDispatchType }}>
+    <StoreContext.Provider
+      value={{
+        setDispatchType,
+      }}
+    >
       <Routes>
         <Route exact path="/" element={<Main />} />
         <Route exact path="/on1" element={<On1 />} />
         <Route exact path="/on2" element={<On2 />} />
         <Route exact path="/on3" element={<On3 />} />
         <Route exact path="/on4" element={<On4 />} />
-        <Route exact path="/on5" element={<On5 />} />
         <Route exact path="/on5" element={<On5 />} />
         <Route exact path="/result" element={<Result />} />
       </Routes>
