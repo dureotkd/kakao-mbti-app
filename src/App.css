@@ -63,3 +63,11 @@ body {
   margin-top: 60px;
   margin-bottom: 60px;
 }
+
+.result-img-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}

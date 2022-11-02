@@ -3,6 +3,34 @@ const cors = require("cors");
 const app = express();
 const port = 5000;
 
+const characters = [
+  {
+    name: "콘",
+    content: "https://kakaofriendsmbti.netlify.app/images/ENFJ.png",
+    mbti: "ESFJ", // for , for of [구글 에서 검색]
+  },
+  {
+    name: "빠냐",
+    content: "https://kakaofriendsmbti.netlify.app/images/ESTJ.png",
+    mbti: "ESTJ",
+  },
+  {
+    name: "앙몬드",
+    content: "https://kakaofriendsmbti.netlify.app/images/INFP.png",
+    mbti: "INFP",
+  },
+  {
+    name: "어피치",
+    content: "https://kakaofriendsmbti.netlify.app/images/ENTP.png",
+    mbti: "ENTP",
+  },
+  {
+    name: "죠르디",
+    content: "https://kakaofriendsmbti.netlify.app/images/ISFJ.png",
+    mbti: "ISFJ",
+  },
+];
+
 app.use(cors());
 
 app.get("/", (req, res) => {
@@ -10,41 +38,42 @@ app.get("/", (req, res) => {
 });
 
 app.get("/mbti", (req, res) => {
+  let result = "";
   const mbti = req.query;
 
-  let result = "";
+  /**
+   * for in
+   * for
+   */
 
+  /**
+   * 1. 난이도 높은 (코드가 훨씬 깔끔하고 빠름)
+   * 2. 난이도 낮은데 (노가다해야됨)
+   */
   for (let key in mbti) {
     const 객체 = mbti[key];
 
-    const [one, two] = Object.keys(객체);
-    const [oneVal, twoVal] = Object.values(객체);
+    // Destructring
+    const [왼쪽mbti, 오른쪽mbti] = Object.keys(객체);
+    const [왼쪽값, 오른쪽값] = Object.values(객체);
 
-    if (oneVal >= twoVal) {
-      result += one;
+    if (왼쪽값 >= 오른쪽값) {
+      result += 왼쪽mbti;
     } else {
-      result += two;
+      result += 오른쪽mbti;
     }
-
-    // if (value["I"] > value["E"]) {
-    //   result += "I";
-    // } else {
-    //   result += "E";
-    // }
   }
 
-  console.log(result);
+  const [캐릭터결과] = characters.filter((item) => {
+    return item.mbti === result;
+  });
 
-  // console.log(mbti.for);
-  // mbti.forEach((item) => {
-  //   console.log(item);
-  // });
+  /**
+   * MBTI 값이 동일한 객체를 뽑아주세요 !!
+   * (만약 아예없으면 그냥 안나오게... )
+   */
 
-  // console.log(req.query);
-
-  // ESFJ
-
-  res.send("여기는 MBTI 결과값을 리턴해야합니다.");
+  res.send(캐릭터결과);
 });
 
 app.listen(port, () => {
