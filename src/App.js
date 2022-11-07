@@ -156,7 +156,15 @@ function Result() {
 }
 
 function Main() {
+  const { setDispatchType } = React.useContext(StoreContext);
+
   const navigation = useNavigate();
+
+  React.useEffect(() => {
+    setDispatchType({
+      code: "임시저장",
+    });
+  }, []);
 
   return (
     <div className="main-app">
@@ -226,9 +234,15 @@ function App() {
 
         /**
          * 페이지 이동
+         *
          */
         const nextPage = (page += 1);
         setPage(nextPage);
+
+        localStorage.setItem("MBTI", JSON.stringify(cloneMbti));
+        localStorage.setItem("PAGE", nextPage);
+
+        //      localStorage.setItem('MBTI',값~~);
 
         if (nextPage === 6) {
           navigation("/result", {
@@ -236,6 +250,25 @@ function App() {
           });
         } else {
           navigation(`/on${nextPage}`);
+        }
+
+        break;
+
+      case "임시저장":
+        const 기억되어있는MBTI = localStorage.getItem("MBTI");
+        const 기억되어있는PAGE = localStorage.getItem("PAGE");
+
+        if (기억되어있는PAGE === "6") {
+          localStorage.removeItem("MBTI");
+          localStorage.removeItem("PAGE");
+          return;
+        }
+
+        if (기억되어있는MBTI && 기억되어있는PAGE) {
+          const 기억되어있는MBTI배열 = JSON.parse(기억되어있는MBTI);
+          setMbti(기억되어있는MBTI배열);
+          setPage(Number(기억되어있는PAGE));
+          navigation(`/on${기억되어있는PAGE}`);
         }
 
         break;
